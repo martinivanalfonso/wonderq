@@ -1,0 +1,20 @@
+{
+  "name": "wonderq",
+  "version": "1.0.0",
+  "description": "Simple Message Queue Powered by Redis",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinivanalfonso/wonderq.git"
+  },
+  "keywords": [
+    "redis-queue",
+    "wonderq"
+  ],
+  "author": "Martin Alfonso",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.0.0-rc.3",
+    "redis": "^2.6.0-1"
+  }
+}
