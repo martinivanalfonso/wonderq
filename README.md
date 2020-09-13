@@ -6,7 +6,7 @@ Fast & lightweight message queue for Node.js powered by Redis.
 * Atomic: messages are delivered only once to a consumer
 * High Performance: Send/receive 10000+ messages per second on an average machine
 * Linked List Structure: Fast operations O(1) to remove an add a message to the queue.
-* Visibility timeout for messages that are received but not proccesed (requires a worker for checking)
+* Visibility timeout for messages that are received but not proccesed 
 * RESTful interface
 * Test Coverage
 
@@ -20,11 +20,11 @@ POST /jobdone/ Sumbit a json object identical to the one requested previously in
 Detailed API Docs for routes can be found at ./server.js
 
 ## Installation
-`npm install`
-`npm run postinstall`
-`npm run start`
+`npm install`<br>
+`npm run postinstall`<br>
+`npm run start`<br>
 
-Note: You need a Redis instance running on port 6379, run the following docker command to achieve that:
+Note: You need a Redis instance running on port 6379, run the following docker command to achieve that:<br>
 `docker run --name redis_container -d -p 6379:6379 -i -t redis:alpine`
 
 ## Production
@@ -32,7 +32,6 @@ Note: You need a Redis instance running on port 6379, run the following docker c
 In order to improve this module and scale it to be production ready the next steps would be recommended:
 
 * Set up a worker that persists data to a local database regularly as a backup
-* Set up a worker that checks for messages with expired timeout regularly
 * Set up a logger and any other middleware required (log4js)
 * Add Authentication for consumers/producers (e.g jwt)
 * Add CI tools such as ESLint to detect failures before sending to production

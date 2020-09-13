@@ -50,7 +50,9 @@ class WonderQ {
     // Deletes Job from Processing Queue 
     jobDone(value, callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
-        this.redis.lrem(this.proccesingQueueName, 1, value, (err) => callback(err, value.id));
+
+        const { id } = JSON.parse(value)
+        this.redis.lrem(this.proccesingQueueName, 1, value, (err) => callback(err, id ));
     }
 
     // Moves Job from Proccesing Queue back to Work Queue
@@ -58,7 +60,29 @@ class WonderQ {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
         this.redis.lpush([ this.queueName, value ], callback);
-        this.redis.lrem(this.queueName, this.proccesingQueueName, (err, messages) => callback(err, messages));
+        this.redis.lrem(this.queueName, this.proccesingQueueName, (err, job) => callback(err, job));
+    }
+
+    checkExpiredJobs(callback) {
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
+
+        try {
+            const job = this.redis.lrange(this.proccesingQueueName, 0, 0)
+            if (!job) return callback(new Error("Proccesing Queue empty."));
+            const { timestamp } = JSON.parse(job)
+    
+            const timeSpentInQueue = Date.now() - timestamp
+    
+            if (timeSpentInQueue > this.vt) {
+                this.requeue(job, callback)
+            } else {
+                callback(null)
+            }
+            
+        } catch (err) {
+            console.log(err)
+            callback(new Error("Failed to check Proccesing Queue."))
+        }
     }
 
     removeAmount(amount, callback) {

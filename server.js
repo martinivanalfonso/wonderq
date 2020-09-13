@@ -40,6 +40,7 @@ app.post("/", async (req, res) => {
   await wonderQ.push(req.body.job, (err, value) => {
     if (err) return res.sendStatus(500);
     if (!value) return res.sendStatus(400);
+    console.log('result was ' + value)
     res.send({data: value});
   });
 });
@@ -54,6 +55,10 @@ app.post("/", async (req, res) => {
  */
 
 app.get("/", async (req, res) => {
+  await wonderQ.checkExpiredJobs((err) =>{
+    if (err) console.log(err)
+  })
+  
   await wonderQ.get((err, value) => {
     if (err) return res.sendStatus(500);
     if (!value) return res.sendStatus(400);
@@ -72,6 +77,7 @@ app.get("/", async (req, res) => {
  * @apiError 500 Server error.
  */
 app.post("/jobdone/", async (req, res) => {
+  console.log("req to delete is " + req.body.data)
   await wonderQ.jobDone(req.body.data, (err, value) => {
     if (err) return res.sendStatus(500);
     if (!value) return res.sendStatus(400);
