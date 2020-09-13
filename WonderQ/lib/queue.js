@@ -1,6 +1,6 @@
 const Redis = require("./redis");
+const { v4: uuidv4 } = require('uuid');
 const MAX_UINT = 4294967295; //  pow(2,32)
-
 /*
 	Paramenters for WonderQ:
 	* `host` (String):  The Redis server
@@ -12,6 +12,7 @@ const MAX_UINT = 4294967295; //  pow(2,32)
 class WonderQ {
     constructor(options) {
         this.queueName = this._buildQueueName(options.name);
+        this.proccesingQueueName = this._buildQueueName(options.name) + "_proccessing"
         this.vt = options.visibilityTimeOut || 86400
         this.redis = Redis.createClient(options.port, options.host);
     }
@@ -21,32 +22,43 @@ class WonderQ {
     }
 
     select(value, callback) {
-        if(!this.redis) {
-            return callback(new Error("Redis has been disconnected."));
-        }
-        console.log( this.vt)
-        console.log( this.queueName)
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
+
         this.redis.select(value,callback);
     }
 
+    // Pushes job to Work Queue
     push(value, callback) {
-        if(!this.redis) {
-            return callback(new Error("Redis has been disconnected."));
-        }
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
-        this.redis.rpush([ this.queueName, value ], callback);
+        const valueJSON = JSON.stringify({
+            id: uuidv4(), // -> '6c84fb90-12c4-11e1-840d-7b25c5ee775a' 
+            value,
+            timestamp: Date.now() 
+        })
+
+        this.redis.lpush([ this.queueName, valueJSON ], (err) => callback(err, valueJSON));
     }
 
-    get(amount, callback) {
-        if(typeof amount === "function") {
-            callback = amount;
-            amount = 1;
-        }
-        if(amount === -1) {
-            amount = MAX_UINT;
-        }
+    // Moves Job from Work Queue to Processing Queue and returns it
+    get(callback) {
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
-        this.redis.lrange([ this.queueName, 0, amount - 1 ], (err, messages) => callback(err, messages));
+        this.redis.rpoplpush(this.queueName, this.proccesingQueueName, (err, value) => callback(err, value));
+    }
+    
+    // Deletes Job from Processing Queue 
+    jobDone(value, callback) {
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
+        this.redis.lrem(this.proccesingQueueName, 1, value, callback);
+    }
+
+    // Moves Job from Proccesing Queue back to Work Queue
+    requeue(value, callback) {
+        if(!this.redis) return callback(new Error("Redis has been disconnected."));
+
+        this.redis.lpush([ this.queueName, value ], callback);
+        this.redis.lrem(this.queueName, this.proccesingQueueName, (err, messages) => callback(err, messages));
     }
 
     removeAmount(amount, callback) {
@@ -74,7 +86,7 @@ class WonderQ {
     }
 
     deleteQueue(callback) {
-        this.redis.del([ this.queueName ], callback);
+        this.redis.del([ this.proccesingQueueName ], callback);
     }
 }
 

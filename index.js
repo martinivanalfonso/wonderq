@@ -2,11 +2,11 @@ const wq = require("./WonderQ");
 
 /*
 ======================================
-WonderQ is simple queue that allows writers to write to it, and consumers to read from it.
+WonderQ is simple queue that allows writers to write to it, and consumer to read from it.
 ======================================
 */
 
-function main() {
+async function main() {
   console.log("Starting server...");
 
   const wonderQ = new wq.WonderQ({
@@ -16,17 +16,33 @@ function main() {
     visibilityTimeOut: 300,
   });
 
-  wonderQ.select(0, () => {
-    console.log("db select success");
+  await wonderQ.push("TESTA", (err, value) => {
+    if (err) console.log(err);
+    console.log('push' + value)
+  });
+  await wonderQ.push("TESTB", (err, value) => {
+    if (err) console.log(err);
+    console.log('push' + value)
   });
 
-  wonderQ.push("Your message here", (err) => {
+  await wonderQ.get((err, messages) => {
     if (err) console.log(err);
+    if (messages.length) console.log(messages);
   });
 
-  wonderQ.get((err, messages) => {
+  await wonderQ.get((err, value) => {
     if (err) console.log(err);
-    if (messages.length) console.log(messages[0]);
+    console.log(value);
+
+   wonderQ.jobDone(value, (err) => {
+      if (err) console.log(err)
+      console.log("job done")
+    })
+
+      wonderQ.destroy()
+
   });
+
+
 }
 main();
