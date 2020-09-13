@@ -1,6 +1,9 @@
 # WonderQ 
 Fast & lightweight message queue for Node.js powered by Redis.
 
+First In First Out (FIFO) type of flow <br>
+![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Data_Queue.svg/300px-Data_Queue.svg.png)
+
 ## Features
 * Lightweight: Redis + ~200 lines of javascript
 * Atomic: messages are delivered only once to a consumer
@@ -21,7 +24,7 @@ Detailed API Docs for routes can be found at ./server.js
 
 ## Installation
 
-Steps: 
+Steps: <br>
 `npm install`<br>
 `npm run postinstall`<br>
 `npm run start`<br>
