@@ -64,7 +64,7 @@ app.get("/", async (req, res) => {
 /**
  * @api {post} /jobdone/ Deletes a job from the queue
  *
- * @apiParam {Object} job: JSON Object containing job value, id and timestamp
+ * @apiParam {Object} data: JSON Object containing job value, id and timestamp
  *
  * @apiSuccess {String} id: Job ID
  *
@@ -72,10 +72,10 @@ app.get("/", async (req, res) => {
  * @apiError 500 Server error.
  */
 app.post("/jobdone/", async (req, res) => {
-  await wonderQ.jobDone(req.job, (err, value) => {
+  await wonderQ.jobDone(req.body.data, (err, value) => {
     if (err) return res.sendStatus(500);
     if (!value) return res.sendStatus(400);
-    res.send({data: value.id});
+    res.send(value);
   });
 });
 

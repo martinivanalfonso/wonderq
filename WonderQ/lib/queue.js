@@ -50,7 +50,7 @@ class WonderQ {
     // Deletes Job from Processing Queue 
     jobDone(value, callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
-        this.redis.lrem(this.proccesingQueueName, 1, value, callback);
+        this.redis.lrem(this.proccesingQueueName, 1, value, (err) => callback(err, value.id));
     }
 
     // Moves Job from Proccesing Queue back to Work Queue
