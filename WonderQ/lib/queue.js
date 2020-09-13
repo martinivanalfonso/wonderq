@@ -2,7 +2,7 @@ const Redis = require("./redis");
 const { v4: uuidv4 } = require('uuid');
 const MAX_UINT = 4294967295; //  pow(2,32)
 /*
-	Paramenters for WonderQ:
+	Parameters for WonderQ:
 	* `host` (String):  The Redis server
 	* `port` (Number):  The Redis port
 	* `name` (String):  The Queue Name
@@ -21,6 +21,7 @@ class WonderQ {
         return "_bearer_:" + name;
     }
 
+    // Selects a specific Redis database, default: 0
     select(value, callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
@@ -63,6 +64,7 @@ class WonderQ {
         this.redis.lrem(this.queueName, this.proccesingQueueName, (err, job) => callback(err, job));
     }
 
+    // Calls requeue() if a expired job is found
     checkExpiredJobs(callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
@@ -85,6 +87,7 @@ class WonderQ {
         }
     }
 
+    // Removes a specific amount of elements from the Work Queue
     removeAmount(amount, callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
 
@@ -99,16 +102,19 @@ class WonderQ {
         this.redis.ltrim([ this.queueName, amount, "-1" ], callback);
     }
 
+    // Returns current length of Work Queue
     length(callback) {
         if(!this.redis) return callback(new Error("Redis has been disconnected."));
         this.redis.llen([ this.queueName ], callback);
     }
 
+    // Releases Redis instance
     destroy() {
         Redis.releaseClient(this.redis);
         this.redis = undefined;
     }
 
+    // Deletes Processing Queue
     deleteQueue(callback) {
         this.redis.del([ this.proccesingQueueName ], callback);
     }

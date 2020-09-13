@@ -4,22 +4,24 @@ Fast & lightweight message queue for Node.js powered by Redis.
 ## Features
 * Lightweight: Redis + ~200 lines of javascript
 * Atomic: messages are delivered only once to a consumer
-* High Performance: Send/receive 10000+ messages per second on an average machine
-* Linked List Structure: Fast operations O(1) to remove an add a message to the queue.
+* High Performance: send/receive 10000+ messages per second on an average machine
+* Linked List Structure: Fast operations O(1) to remove and add a message to the queue.
 * Visibility timeout for messages that are received but not proccesed 
 * RESTful interface
 * Test Coverage
 
-## Endpoints
-POST / Sumbit a string with the message/task/job
+## Endpoints Usage
+POST "/" - Submit a string with the message/task/job
 
-GET / Request a json object with the next job, id and timestamp
+GET "/" - Request a json object with the next job, id and timestamp
 
-POST /jobdone/ Sumbit a json object identical to the one requested previously in order to delete it succesfully
+POST "/jobdone/" - Submit a json object identical to the one requested previously in order to delete it succesfully
 
 Detailed API Docs for routes can be found at ./server.js
 
 ## Installation
+
+Steps: 
 `npm install`<br>
 `npm run postinstall`<br>
 `npm run start`<br>
@@ -42,4 +44,4 @@ In order to improve this module and scale it to be production ready the next ste
 
 * Downtime: The server must go on and get restarted upon failures, dockerize and set up a cluster management tool to fix this (docker-compose)
 * Security vulnerabilities:  Implement rate limiting using a cloud firewall to prevent Dos attacks and subsequent denial of service
-* Dependencies vulnerabilities: Keep dependencies in check with by tracking and monitoring them with package management tools (npm audit)
+* Dependencies vulnerabilities: Keep dependencies in check by tracking and monitoring them with package management tools (npm audit)
